@@ -1,0 +1,47 @@
+ //Задача 1. Реализовать DFS для поиска всех вершин в графе.
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void DFS(vector<vector<int>>& graph, vector<bool>& visited, int vert, vector<int>& route) 
+{
+	visited[vert] = true;
+	route.push_back(vert);
+	for (int i = 0; i < graph.size(); i++)
+		if (!visited[i] && find(graph[vert].begin(), graph[vert].end(), i) != graph[vert].end())
+			DFS(graph, visited, i, route);
+}
+
+
+int main() 
+{
+	freopen("input.txt", "r", stdin);
+
+	int n, m;
+	//n - кол-во вершин, m - кол-во рёбер в графе
+	cin >> n >> m;
+
+	vector<vector<int>> graph(n);
+	//граф является невзвешенным
+
+	for (int i = 0; i < m; i++)
+	{
+		int from, to;
+		cin >> from >> to;
+		graph[from].push_back(to);
+		graph[to].push_back(from);
+	}
+
+	vector<bool> visited(n);
+	
+	int start;
+	cin >> start;
+	vector<int> route;
+	DFS(graph, visited, start, route);
+
+	for (int vert : route)
+		cout << vert << '\t';
+
+	return 0;
+}
