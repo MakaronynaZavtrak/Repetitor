@@ -1,0 +1,59 @@
+//2. Найти все компоненты связности в графе, используя DFS.//
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void DFS(vector<vector<int>>& graph, vector<bool>& visited, int vert) 
+{
+	visited[vert] = true;
+	for (int neighbour : graph[vert])
+		if (!visited[neighbour])
+			DFS(graph, visited, neighbour);
+}
+
+int countComponents(vector<vector<int>>& graph) 
+{
+	int comp = 0;
+	vector<bool> visited(graph.size());
+	for (int i = 0; i < graph.size(); i++)
+	{
+		if (!visited[i]) 
+		{
+			DFS(graph, visited, i);
+			comp++;
+		}
+	}
+	return comp;
+}
+
+
+int main() 
+{
+	freopen("input.txt", "r", stdin);
+
+	int n, m;
+	//n - кол-во вершин, m - кол-во рёбер в графе
+	cin >> n >> m;
+
+	vector<vector<int>> graph(n);
+	//граф является невзвешенным
+
+	for (int i = 0; i < m; i++)
+	{
+		int from, to;
+		cin >> from >> to;
+		graph[from].push_back(to);
+		graph[to].push_back(from);
+	}
+
+	vector<bool> visited(n);
+	
+	int start;
+	cin >> start;
+
+	int comp = countComponents(graph);
+	cout << comp;
+
+	return 0;
+}
