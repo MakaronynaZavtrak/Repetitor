@@ -1,0 +1,99 @@
+//5. Определить, является ли граф деревом, используя DFS.
+//По определению, граф является деревом, если он:
+//1) связный (т.е. имеет одну компоненту связности)
+//2) не содержит циклов
+//Идея задачи: найти количество компонент связности и выяснить, что граф не содержит циклов,
+//и если он имеет одну компоненту и не содержит циклов, вернуть в результате работы основной функции true
+//ВАЖНОЕ ПРИМЕЧАНИЕ: ПРОГРАММА РАБОТАЕТ ТОЛЬКО ДЛЯ ОРИЕНТИРОВАННОГО ГРАФА
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void DFS_for_doesContainsCycle(vector<vector<int>>& graph,  int vert, vector<int>& repeatVerts, bool& answer) 
+{
+	if (find(repeatVerts.begin(), repeatVerts.end(), vert) == repeatVerts.end())
+		repeatVerts.push_back(vert);
+	else
+	{
+		answer = true;
+		return;
+	}
+
+	for (int neighbour : graph[vert])
+		DFS_for_doesContainsCycle(graph, neighbour, repeatVerts, answer);
+}
+
+void DFS_for_countComponents(vector<vector<int>>& graph, int vert, vector<bool>& visited) 
+{
+	visited[vert] = true;
+	for (int neighbour : graph[vert])
+		if (!visited[neighbour])
+			DFS_for_countComponents(graph, neighbour, visited);
+}
+
+bool doesContainsCycle(vector<vector<int>>& graph, int root) 
+{
+	vector<int> repeatVerts;
+	bool answer = false;
+	DFS_for_doesContainsCycle(graph, root, repeatVerts, answer);
+	return answer;
+}
+
+int countComponents(vector<vector<int>>& graph, int root) 
+{
+	vector<bool> visited(graph.size());
+	int comp = 0;
+	DFS_for_countComponents(graph, root, visited);
+	comp++;
+	for (int i = 0; i < graph.size(); i++)
+	{
+		if (!visited[i]) 
+		{
+			DFS_for_countComponents(graph, i, visited);
+			comp++;
+		}
+	}
+	return comp;
+}
+
+bool isTree(vector<vector<int>>& graph, int root) 
+{
+	int comp = countComponents(graph, root);
+	if (comp != 1)
+		return false;
+
+	bool containsCycle = doesContainsCycle(graph, root);
+	if (!containsCycle)
+		return true;
+	else
+		return false;
+}
+
+int main() 
+{
+	freopen("input.txt", "r", stdin);
+
+	int n, m;
+	//n - кол-во вершин, m - кол-во рёбер в графе
+	cin >> n >> m;
+
+	vector<vector<int>> graph(n);
+	//граф является невзвешенным
+
+	for (int i = 0; i < m; i++)
+	{
+		int from, to;
+		cin >> from >> to;
+		graph[from].push_back(to);
+		//graph[to].push_back(from);
+	}
+
+	vector<bool> visited(n);
+	int root;
+	cin >> root;
+
+	cout << isTree(graph, root);
+
+	return 0;
+}
