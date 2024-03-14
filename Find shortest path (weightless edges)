@@ -1,0 +1,53 @@
+//3. Найти кратчайший путь от одной вершины до другой в графе с помощью DFS.
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void DFS(vector<vector<int>>& graph,  int vert, vector<int>& dist, vector<bool>& visited) 
+{
+	visited[vert] = true;
+	for (int neighbour : graph[vert])
+		if (!visited[neighbour] || dist[neighbour] > dist[vert] + 1)
+		{
+			dist[neighbour] = dist[vert] + 1;
+			DFS(graph, neighbour, dist, visited);
+		}
+}
+
+int findShortestPath(vector<vector<int>>& graph, int from, int to) 
+{
+	vector<int> dist(graph.size());
+	vector<bool> visited(graph.size());
+	DFS(graph, from, dist, visited);
+	return dist[to];
+}
+
+int main() 
+{
+	freopen("input.txt", "r", stdin);
+
+	int n, m;
+	//n - кол-во вершин, m - кол-во рёбер в графе
+	cin >> n >> m;
+
+	vector<vector<int>> graph(n);
+	//граф является невзвешенным
+
+	for (int i = 0; i < m; i++)
+	{
+		int from, to;
+		cin >> from >> to;
+		graph[from].push_back(to);
+		graph[to].push_back(from);
+	}
+
+	vector<bool> visited(n);
+	
+	int from = 5;
+	int to = 0;
+
+	cout << findShortestPath(graph, from, to);
+
+	return 0;
+}
