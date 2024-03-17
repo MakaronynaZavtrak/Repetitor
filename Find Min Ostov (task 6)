@@ -1,0 +1,73 @@
+//6. Найти наименьшее остовное дерево в графе с помощью DFS.
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<pair<int, int>> DFS(vector<vector<int>>& graph, int start) 
+{
+	vector<pair<int, int>> ostov;
+	vector<int> visited;
+	vector<int> unvisited;
+	for (int i = 0; i < graph.size(); i++) unvisited.push_back(i);
+	visited.push_back(start);
+	unvisited.erase(unvisited.begin() + start);
+
+	while (!unvisited.empty()) 
+	{
+		int minDist = INT_MAX;
+		int from = 0;
+		int to = 0;
+		for (int vert : visited) 
+		{
+			for (int adjacent = 0; adjacent < graph.size(); adjacent++) 
+			{
+				if (graph[vert][adjacent] < minDist && find(visited.begin(), visited.end(), adjacent) == visited.end())
+				{
+					minDist = graph[vert][adjacent];
+					from = vert;
+					to = adjacent;
+				}
+			}
+		}
+		ostov.push_back(make_pair(from, to));
+		visited.push_back(to);
+		auto item = find(unvisited.begin(), unvisited.end(), to);
+		int index = item - unvisited.begin();
+		unvisited.erase(unvisited.begin() + index);
+	}
+	return ostov;
+}
+
+int main() 
+{
+	freopen("input.txt", "r", stdin);
+
+	int n, m;
+	//n - кол-во вершин, m - кол-во рёбер в графе
+	cin >> n >> m;
+
+	vector<vector<int>> graph(n, vector<int>(n, INT_MAX));
+	//граф является взвешенным и неориетнированным
+
+	for (int i = 0; i < m; i++)
+	{
+		int from, to, weight;
+		cin >> from >> to >> weight;
+		graph[from][to] = weight;
+		graph[to][from] = weight;
+	}
+
+	vector<bool> visited(n);
+
+	int start;
+	cin >> start;
+	
+	vector<pair<int, int>> res = DFS(graph, start);
+
+	
+	for (auto& edge : res) 
+		cout << edge.first << '-' << edge.second << '\t';
+
+	return 0;
+}
