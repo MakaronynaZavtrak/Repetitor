@@ -1,0 +1,88 @@
+//8. Найти наибольшее количество ребер, которые можно удалить из графа, чтобы он остался связным, используя DFS.
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<pair<int, pair<int, int>>> DFS(vector<vector<int>>& graph, int start) 
+{
+	vector<pair<int, pair<int, int>>> ostov;
+	vector<int> visited;
+	vector<int> unvisited;
+	for (int i = 0; i < graph.size(); i++) unvisited.push_back(i);
+	visited.push_back(start);
+	unvisited.erase(unvisited.begin() + start);
+
+	while (!unvisited.empty()) 
+	{
+		int minDist = INT_MAX;
+		int from = 0;
+		int to = 0;
+		for (int vert : visited) 
+		{
+			for (int adjacent = 0; adjacent < graph.size(); adjacent++) 
+			{
+				if (graph[vert][adjacent] < minDist && find(visited.begin(), visited.end(), adjacent) == visited.end())
+				{
+					minDist = graph[vert][adjacent];
+					from = vert;
+					to = adjacent;
+				}
+			}
+		}
+		ostov.push_back(make_pair(from, make_pair(to, minDist)));
+		visited.push_back(to);
+		auto item = find(unvisited.begin(), unvisited.end(), to);
+		int index = item - unvisited.begin();
+		unvisited.erase(unvisited.begin() + index);
+	}
+	return ostov;
+}
+
+vector<vector<int>> deleteOddEdges(vector<vector<int>>& graph) 
+{
+	vector<pair<int, pair<int, int>>> ostovMinTree = DFS(graph, 0);
+	vector<vector<int>> cutGraph(graph.size(), vector<int>(graph.size(), INT_MAX));
+	for (auto& edge : ostovMinTree) 
+	{
+		cutGraph[edge.first][edge.second.first] = edge.second.second;
+		cutGraph[edge.second.first][edge.first] = edge.second.second;
+	}
+	return cutGraph;
+}
+
+int main() 
+{
+	freopen("input.txt", "r", stdin);
+
+	int n, m;
+	//n - кол-во вершин, m - кол-во рёбер в графе
+	cin >> n >> m;
+
+	vector<vector<int>> graph(n, vector<int>(n, INT_MAX));
+	//граф является взвешенным и неориетнированным
+
+	for (int i = 0; i < m; i++)
+	{
+		int from, to, weight;
+		cin >> from >> to >> weight;
+		graph[from][to] = weight;
+		graph[to][from] = weight;
+	}
+
+	vector<vector<int>> cutGraph = deleteOddEdges(graph);
+	for (int vert = 0; vert < cutGraph.size(); vert++)
+	{
+		for (int weight : cutGraph[vert]) 
+		{
+			if (weight != INT_MAX) 
+			{
+				auto item = find(cutGraph[vert].begin(), cutGraph[vert].end(), weight);
+				int to = item - cutGraph[vert].begin();
+				cout << vert << '-' << to << ':' << weight << '\n';
+			}
+		}
+	}
+
+	return 0;
+}
