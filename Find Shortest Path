@@ -1,0 +1,62 @@
+//10. Найти кратчайший путь от одной вершины до другой в графе, с учетом весов ребер, используя DFS.//
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<int> DFS(vector<vector<int>>& graph, int from) 
+{
+	vector<int> dist(graph.size(), INT_MAX);
+	vector<bool> visited(graph.size());
+	dist[from] = 0;
+
+	for (int i = 0; i < graph.size(); i++)
+	{
+		int nextVert = 0;
+		for (int j = 0; j < graph.size(); j++)
+			if ((dist[j] < dist[nextVert] && !visited[j]) || visited[nextVert])
+				nextVert = j;
+
+		for (int j = 0; j < graph.size(); j++)
+		{
+			if (graph[nextVert][j] == INT_MAX)
+				continue;
+
+			if (graph[nextVert][j] + dist[nextVert] < dist[j] && !visited[j])
+				dist[j] = graph[nextVert][j] + dist[nextVert];
+		}
+		visited[nextVert] = true;
+	}
+	return dist;
+}
+
+int findShortestPath(vector<vector<int>>& graph, int from, int to) 
+{
+	vector<int> dist = DFS(graph, from);
+	return dist[to];
+}
+
+int main() 
+{
+	freopen("input.txt", "r", stdin);
+
+	int n, m;
+	//n - кол-во вершин, m - кол-во рёбер в графе
+	cin >> n >> m;
+
+	vector<vector<int>> graph(n, vector<int>(n, INT_MAX));
+	//граф является взвешенным и неориетнированным
+
+	for (int i = 0; i < m; i++)
+	{
+		int from, to, weight;
+		cin >> from >> to >> weight;
+		graph[from][to] = weight;
+		graph[to][from] = weight;
+	}
+
+	cout << findShortestPath(graph, 0, 5);
+
+
+	return 0;
+}
