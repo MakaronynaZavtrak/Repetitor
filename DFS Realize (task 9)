@@ -1,0 +1,47 @@
+//9. Реализовать поиск в глубину для заданного графа,
+//  представленного с помощью матрицы смежности
+// (В результате выполнения этого кода
+//   ДОЛЖНА БЫТЬ выведена последовательность вершин обхода в глубину, начиная с вершины 0.).
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void DFS(vector<vector<int>>& graph, int vert, vector<bool>& visited, vector<int>& route) 
+{
+	visited[vert] = true;
+	route.push_back(vert);
+	for (int adjacent = 0; adjacent < graph.size(); adjacent++) 
+	{
+		if (!visited[adjacent] && graph[vert][adjacent] != INT_MAX)
+			DFS(graph, adjacent, visited, route);
+	}
+}
+
+int main() 
+{
+	freopen("input.txt", "r", stdin);
+
+	int n, m;
+	//n - кол-во вершин, m - кол-во рёбер в графе
+	cin >> n >> m;
+
+	vector<vector<int>> graph(n, vector<int>(n, INT_MAX));
+	//граф является взвешенным и неориетнированным
+
+	for (int i = 0; i < m; i++)
+	{
+		int from, to, weight;
+		cin >> from >> to >> weight;
+		graph[from][to] = weight;
+		graph[to][from] = weight;
+	}
+
+	vector<int> route;
+	vector<bool> visited(graph.size());
+	DFS(graph, 0, visited, route);
+	for (int vert : route)
+		cout << vert << '\t';
+
+	return 0;
+}
